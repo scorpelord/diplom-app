@@ -1,4 +1,4 @@
-# Дипломный практикум в Yandex.Cloud
+# Дипломный практикум в Yandex.Cloud - `Молоствов Андрей`
 
 # Создание облачной инфраструктуры
 Созданы: VPC сеть diploma-net, подсети в трёх зонах доступности (ru-central1-a, ru-central1-b, ru-central1-d), группа безопасности k8s-sg, сервисный аккаунт k8s-sa с необходимыми ролями, кластер Managed Kubernetes diploma-cluster, группа worker-нод worker-nodes (2 прерываемые ВМ с 2 vCPU и 4 ГБ RAM). State-файл Terraform хранится локально (планируется перенос в S3 bucket).
