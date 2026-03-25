@@ -19,17 +19,22 @@
 
 # Создание Kubernetes кластера
 Кластер diploma-cluster (версия 1.31) содержит 2 worker-ноды в статусе Ready. Ноды являются прерываемыми (preemptible) для экономии ресурсов, развёрнуты в зоне ru-central1-a.
+
 <img width="659" height="79" alt="image" src="https://github.com/user-attachments/assets/f7340975-93aa-44b3-91e9-2b8dfd19b3e8" />
 
 Все системные компоненты (CoreDNS, kube-proxy, metrics-server, Yandex Disk CSI driver) работают штатно, статус Running.
+
 <img width="669" height="260" alt="image" src="https://github.com/user-attachments/assets/c7450b89-75f5-4413-8647-74c9e2c30a98" />
 
 Файл ~/.kube/config содержит данные для подключения к кластеру diploma-cluster через внешний endpoint. Аутентификация настроена через Yandex Cloud CLI.
+
 <img width="1126" height="532" alt="image" src="https://github.com/user-attachments/assets/53f1b568-97d8-46cf-b594-f715b63f567f" />
 
 # Создание тестового приложения
 
+Репозиторий scorpelord/diplom-app содержит Dockerfile на основе nginx:alpine и index.html с тестовой страницей.
 
 <img width="653" height="233" alt="image" src="https://github.com/user-attachments/assets/7580f58d-69bf-4058-beca-632266ef728b" />
 
+<img width="653" height="328" alt="image" src="https://github.com/user-attachments/assets/993ed8c8-a826-4185-8a09-cb10bf0f3aec" />
 
