@@ -16,13 +16,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # 1. Логинимся в Container Registry через официальный экшен
-    - name: Login to Yandex Cloud Container Registry
-      uses: yc-actions/yc-cr-login@v3
+    # Получаем IAM-токен для сервисного аккаунта
+    - name: Get IAM token
+      id: get-iam-token
+      uses: yc-actions/yc-iam-token@v1
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CONTENT }}
     
-    # 2. Собираем и пушим образ
+    # Логинимся в Container Registry с помощью IAM-токена
+    - name: Login to Yandex Cloud Container Registry
+      run: |
+        echo ${{ steps.get-iam-token.outputs.token }} | docker login \
+          --username iam \
+          --password-stdin \
+          cr.yandex
+    
+    # Собираем и пушим образ
     - name: Build and push Docker image
       run: |
         if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -35,7 +44,7 @@ jobs:
         docker tag cr.yandex/$REGISTRY_ID/diplom-app:$TAG cr.yandex/$REGISTRY_ID/diplom-app:latest
         docker push cr.yandex/$REGISTRY_ID/diplom-app --all-tags
     
-    # 3. Деплой при создании тега
+    # Деплой при создании тега
     - name: Setup kubectl
       if: startsWith(github.ref, 'refs/tags/')
       uses: azure/setup-kubectl@v4
