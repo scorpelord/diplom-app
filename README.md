@@ -38,3 +38,6 @@
 
 <img width="653" height="328" alt="image" src="https://github.com/user-attachments/assets/993ed8c8-a826-4185-8a09-cb10bf0f3aec" />
 
+Образ diplom-app:latest загружен в registry crpajqvnc6vh3duplq4s. Сборка выполнена командой docker build с последующим push.
+
+<img width="915" height="108" alt="image" src="https://github.com/user-attachments/assets/813a6866-1c7c-4924-8291-a20ac31e0c5d" />
