@@ -60,4 +60,10 @@
 
 <img width="820" height="180" alt="image" src="https://github.com/user-attachments/assets/df7ca0df-225c-4c0f-9c42-62cdd5bee215" />
 
+# Установка и настройка CI/CD
+
+Настроен CI/CD через GitHub Actions: при пуше в main происходит сборка Docker-образа и его публикация в Container Registry (зелёный запуск workflow на скриншоте).
+
+<img width="1902" height="896" alt="image" src="https://github.com/user-attachments/assets/6626cf6d-2aed-4f57-9e02-708c4e224ac3" />
+
 
