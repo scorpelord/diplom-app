@@ -1,0 +1,56 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+env:
+  REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup YC CLI
+      uses: yc-actions/yc-cli@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CONTENT }}
+        folder-id: ${{ secrets.YC_FOLDER_ID }}
+    
+    - name: Configure Docker
+      run: |
+        yc container registry configure-docker
+    
+    - name: Build and push Docker image
+      run: |
+        # Определяем тег
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          TAG=${GITHUB_REF#refs/tags/}
+        else
+          TAG=${GITHUB_SHA::8}
+        fi
+        
+        # Собираем и пушим
+        docker build -t cr.yandex/$REGISTRY_ID/diplom-app:$TAG .
+        docker tag cr.yandex/$REGISTRY_ID/diplom-app:$TAG cr.yandex/$REGISTRY_ID/diplom-app:latest
+        docker push cr.yandex/$REGISTRY_ID/diplom-app --all-tags
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+    
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
+        export KUBECONFIG=$(pwd)/kubeconfig.yaml
+    
+    - name: Deploy to Kubernetes
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        kubectl set image deployment/diplom-app app=cr.yandex/$REGISTRY_ID/diplom-app:$TAG --record
+        kubectl rollout status deployment/diplom-app
