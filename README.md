@@ -41,3 +41,12 @@
 Образ diplom-app:latest загружен в registry crpajqvnc6vh3duplq4s. Сборка выполнена командой docker build с последующим push.
 
 <img width="915" height="108" alt="image" src="https://github.com/user-attachments/assets/813a6866-1c7c-4924-8291-a20ac31e0c5d" />
+
+# Подготовка cистемы мониторинга и деплой приложения
+
+Установлен kube-prometheus-stack через Helm. Grafana доступна по внешнему IP через LoadBalancer. На скриншоте отображён дашборд Kubernetes / Compute Resources / Cluster, демонстрирующий состояние кластера, метрики нод и потребление ресурсов.
+Доступ: `http://158.160.227.146`
+Логин: `admin`
+Пароль: `admin123`
+
+<img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/c5bef81d-418c-42ac-92a5-5a618340605b" />
