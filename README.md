@@ -53,3 +53,8 @@
 Пароль: `admin123`
 
 <img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/c5bef81d-418c-42ac-92a5-5a618340605b" />
+
+
+
+<img width="865" height="92" alt="image" src="https://github.com/user-attachments/assets/ad0604fa-beb6-4609-8654-ee7caba645e5" />
+
