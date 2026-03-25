@@ -52,9 +52,12 @@
 
 Пароль: `admin123`
 
-<img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/c5bef81d-418c-42ac-92a5-5a618340605b" />
+<img width="1919" height="948" alt="image" src="https://github.com/user-attachments/assets/8c4e164e-372b-470a-bb83-0072b958f878" />
 
+Приложение развёрнуто в кластере через Deployment (2 реплики) и доступно из интернета через LoadBalancer. Используется образ cr.yandex/crpajqvnc6vh3duplq4s/diplom-app:latest.
 
+Доступ: `http://158.160.210.24`
 
-<img width="865" height="92" alt="image" src="https://github.com/user-attachments/assets/ad0604fa-beb6-4609-8654-ee7caba645e5" />
+<img width="820" height="180" alt="image" src="https://github.com/user-attachments/assets/df7ca0df-225c-4c0f-9c42-62cdd5bee215" />
+
 
