@@ -16,17 +16,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # Получаем IAM-токен для сервисного аккаунта
-    - name: Get IAM token
-      id: get-iam-token
-      uses: yc-actions/yc-iam-token@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CONTENT }}
-    
-    # Логинимся в Container Registry с помощью IAM-токена
+    # Логинимся в CR с помощью IAM-токена
     - name: Login to Yandex Cloud Container Registry
       run: |
-        echo ${{ steps.get-iam-token.outputs.token }} | docker login \
+        echo ${{ secrets.YC_IAM_TOKEN }} | docker login \
           --username iam \
           --password-stdin \
           cr.yandex
@@ -54,7 +47,6 @@ jobs:
       run: |
         echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
         export KUBECONFIG=$(pwd)/kubeconfig.yaml
-        kubectl cluster-info
     
     - name: Deploy to Kubernetes
       if: startsWith(github.ref, 'refs/tags/')
