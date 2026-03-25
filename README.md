@@ -15,3 +15,6 @@
 <img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/7dd842bc-5e1a-46b2-aa9b-b1e27cb70f40" />
 
 <img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/77694939-1cc3-4144-8b89-8c3b51f87d18" />
+
+Кластер diploma-cluster (версия 1.31) содержит 2 worker-ноды в статусе Ready. Ноды являются прерываемыми (preemptible) для экономии ресурсов, развёрнуты в зоне ru-central1-a.
+<img width="659" height="79" alt="image" src="https://github.com/user-attachments/assets/f7340975-93aa-44b3-91e9-2b8dfd19b3e8" />
