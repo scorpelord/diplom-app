@@ -16,42 +16,78 @@ provider "yandex" {
 # VPC СЕТЬ И ПОДСЕТИ
 # ============================================
 
-data "yandex_vpc_network" "diploma" {
+resource "yandex_vpc_network" "diploma" {
   name = "diploma-net"
 }
 
-data "yandex_vpc_subnet" "subnet_a" {
-  name = "diploma-subnet-0"
-}
-
-data "yandex_vpc_subnet" "subnet_b" {
-  name = "diploma-subnet-1"
-}
-
-data "yandex_vpc_subnet" "subnet_d" {
-  name = "diploma-subnet-2"
+resource "yandex_vpc_subnet" "subnets" {
+  count = 3
+  name           = "diploma-subnet-${count.index}"
+  zone           = element(["ru-central1-a", "ru-central1-b", "ru-central1-d"], count.index)
+  network_id     = yandex_vpc_network.diploma.id
+  v4_cidr_blocks = [cidrsubnet("10.0.0.0/16", 8, count.index)]
 }
 
 # ============================================
-# СУЩЕСТВУЮЩИЙ КЛАСТЕР K8S
+# ГРУППА БЕЗОПАСНОСТИ
+# ============================================
+
+resource "yandex_vpc_security_group" "k8s_sg" {
+  name        = "k8s-sg"
+  description = "Security group for Kubernetes cluster"
+  network_id  = yandex_vpc_network.diploma.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Kubernetes API"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 443
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "SSH"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 22
+  }
+
+  egress {
+    protocol       = "ANY"
+    description    = "Allow all outbound"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# ============================================
+# ИСПОЛЬЗУЕМ СУЩЕСТВУЮЩИЙ СЕРВИСНЫЙ АККАУНТ (НЕ СОЗДАЁМ НОВЫЙ)
+# ============================================
+
+data "yandex_iam_service_account" "k8s_sa" {
+  name = "k8s-sa"
+}
+
+# ============================================
+# MANAGED KUBERNETES CLUSTER
 # ============================================
 
 resource "yandex_kubernetes_cluster" "diploma" {
   name        = "diploma-cluster"
   description = "Diploma Kubernetes cluster"
-  network_id  = data.yandex_vpc_network.diploma.id
+  network_id  = yandex_vpc_network.diploma.id
   
   master {
     version = "1.31"
     public_ip = true
+    security_group_ids = [yandex_vpc_security_group.k8s_sg.id]
+    
     zonal {
       zone      = "ru-central1-a"
-      subnet_id = data.yandex_vpc_subnet.subnet_a.id
+      subnet_id = yandex_vpc_subnet.subnets[0].id
     }
   }
   
-  service_account_id      = var.k8s_sa_id
-  node_service_account_id = var.k8s_sa_id
+  service_account_id      = data.yandex_iam_service_account.k8s_sa.id
+  node_service_account_id = data.yandex_iam_service_account.k8s_sa.id
 }
 
 # ============================================
@@ -76,7 +112,7 @@ resource "yandex_kubernetes_node_group" "worker_nodes" {
     }
     
     network_interface {
-      subnet_ids = [data.yandex_vpc_subnet.subnet_a.id]
+      subnet_ids = [yandex_vpc_subnet.subnets[0].id]
       nat        = true
     }
     
@@ -91,6 +127,10 @@ resource "yandex_kubernetes_node_group" "worker_nodes" {
     }
   }
 }
+
+# ============================================
+# OUTPUTS
+# ============================================
 
 output "cluster_id" {
   value = yandex_kubernetes_cluster.diploma.id
