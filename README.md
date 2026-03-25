@@ -30,3 +30,6 @@
 # Создание тестового приложения
 
 
+<img width="653" height="233" alt="image" src="https://github.com/user-attachments/assets/7580f58d-69bf-4058-beca-632266ef728b" />
+
+
