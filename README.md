@@ -45,8 +45,11 @@
 # Подготовка cистемы мониторинга и деплой приложения
 
 Установлен kube-prometheus-stack через Helm. Grafana доступна по внешнему IP через LoadBalancer. На скриншоте отображён дашборд Kubernetes / Compute Resources / Cluster, демонстрирующий состояние кластера, метрики нод и потребление ресурсов.
+
 Доступ: `http://158.160.227.146`
+
 Логин: `admin`
+
 Пароль: `admin123`
 
 <img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/c5bef81d-418c-42ac-92a5-5a618340605b" />
