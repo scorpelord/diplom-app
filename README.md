@@ -1,69 +1,158 @@
-# Дипломный практикум в Yandex.Cloud - `Молоствов Андрей`
+<div align="center">
+  <h1>🎓 Дипломный проект: Облачная инфраструктура в Yandex.Cloud</h1>
+  <p><strong>Выполнял:</strong> Молоствов Андрей</p>
+  <p>
+    <img src="https://img.shields.io/badge/статус-завершён-brightgreen?style=for-the-badge" alt="Status">
+    <img src="https://img.shields.io/badge/платформа-Yandex.Cloud-blue?style=for-the-badge&logo=yandex" alt="Platform">
+    <img src="https://img.shields.io/badge/инфраструктура-Terraform-623CE4?style=for-the-badge&logo=terraform" alt="Terraform">
+    <img src="https://img.shields.io/badge/оркестрация-Kubernetes-326CE5?style=for-the-badge&logo=kubernetes" alt="Kubernetes">
+    <img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions" alt="GitHub Actions">
+  </p>
+</div>
 
-# Создание облачной инфраструктуры
-Созданы: VPC сеть diploma-net, подсети в трёх зонах доступности (ru-central1-a, ru-central1-b, ru-central1-d), группа безопасности k8s-sg, сервисный аккаунт k8s-sa с необходимыми ролями, кластер Managed Kubernetes diploma-cluster, группа worker-нод worker-nodes (2 прерываемые ВМ с 2 vCPU и 4 ГБ RAM). State-файл Terraform хранится локально (планируется перенос в S3 bucket).
+---
 
-<img width="659" height="712" alt="image" src="https://github.com/user-attachments/assets/6801721c-af78-4f43-843c-ec13aba2489e" />
+## 📋 Оглавление
+- [☁️ Создание облачной инфраструктуры](#️-создание-облачной-инфраструктуры)
+- [⚙️ Создание Kubernetes кластера](#️-создание-kubernetes-кластера)
+- [🐳 Создание тестового приложения](#-создание-тестового-приложения)
+- [📊 Система мониторинга](#-система-мониторинга)
+- [🚀 Деплой приложения](#-деплой-приложения)
+- [🔄 Настройка CI/CD](#-настройка-cicd)
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/1781d4d7-9dba-4716-a5b5-7957f24a6e6a" />
+---
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/fe1a413a-d93e-4307-8ed1-a336f6d444e5" />
+## ☁️ Создание облачной инфраструктуры
+Вся сетевая и базовая инфраструктура создана с помощью **Terraform**.
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/1ea6d6a1-5dd5-443f-810a-7b2e5ec71578" />
+| Ресурс | Название | Описание |
+|--------|----------|----------|
+| **VPC сеть** | `diploma-net` | Основная сеть проекта |
+| **Подсети** | `ru-central1-a`, `b`, `d` | Три подсети в разных зонах доступности |
+| **Группа безопасности** | `k8s-sg` | Правила для кластера Kubernetes |
+| **Сервисный аккаунт** | `k8s-sa` | С необходимыми ролями для управления ресурсами |
+| **Кластер K8s** | `diploma-cluster` | Управляемый кластер Managed Kubernetes |
+| **Группа worker-нод** | `worker-nodes` | 2 прерываемые ВМ (2 vCPU, 4 ГБ RAM) |
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/2ba65213-09d9-4c61-a785-d08c9699a4ad" />
+> [!NOTE]
+> State-файл Terraform в данный момент хранится **локально**. В планах — перенести его в удалённое хранилище (S3 bucket).
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/7dd842bc-5e1a-46b2-aa9b-b1e27cb70f40" />
+<div align="center">
+  <a href="./images/vpc">
+    <img src="https://img.shields.io/badge/📸-Посмотреть_скриншоты_VPC-4A90E2?style=for-the-badge&logo=github&logoColor=white" alt="Скриншоты VPC">
+  </a>
+</div>
 
-<img width="659" height="753" alt="image" src="https://github.com/user-attachments/assets/77694939-1cc3-4144-8b89-8c3b51f87d18" />
+---
 
-# Создание Kubernetes кластера
-Кластер diploma-cluster (версия 1.31) содержит 2 worker-ноды в статусе Ready. Ноды являются прерываемыми (preemptible) для экономии ресурсов, развёрнуты в зоне ru-central1-a.
+## ⚙️ Создание Kubernetes кластера
 
-<img width="659" height="79" alt="image" src="https://github.com/user-attachments/assets/f7340975-93aa-44b3-91e9-2b8dfd19b3e8" />
+![kub1](./images/kubernetes/kub1.png)
 
-Все системные компоненты (CoreDNS, kube-proxy, metrics-server, Yandex Disk CSI driver) работают штатно, статус Running.
+**Кластер diploma-cluster (версия 1.31) содержит 2 worker-ноды в статусе Ready. Ноды являются прерываемыми (preemptible) для экономии ресурсов, развёрнуты в зоне ru-central1-a.**
 
-<img width="669" height="260" alt="image" src="https://github.com/user-attachments/assets/c7450b89-75f5-4413-8647-74c9e2c30a98" />
+---
 
-Файл ~/.kube/config содержит данные для подключения к кластеру diploma-cluster через внешний endpoint. Аутентификация настроена через Yandex Cloud CLI.
+![kub2](./images/kubernetes/kub2.png)
 
-<img width="1126" height="532" alt="image" src="https://github.com/user-attachments/assets/53f1b568-97d8-46cf-b594-f715b63f567f" />
+**Все системные компоненты (CoreDNS, kube-proxy, metrics-server, Yandex Disk CSI driver) работают штатно, статус Running.**
 
-# Создание тестового приложения
+---
 
-Репозиторий scorpelord/diplom-app содержит Dockerfile на основе nginx:alpine и index.html с тестовой страницей.
+![kub3](./images/kubernetes/kub3.png)
 
-<img width="653" height="233" alt="image" src="https://github.com/user-attachments/assets/7580f58d-69bf-4058-beca-632266ef728b" />
+**Файл `~/.kube/config` содержит данные для подключения к кластеру diploma-cluster через внешний endpoint. Аутентификация настроена через Yandex Cloud CLI.**
 
-<img width="653" height="328" alt="image" src="https://github.com/user-attachments/assets/993ed8c8-a826-4185-8a09-cb10bf0f3aec" />
+- **Версия кластера:** 1.31
+- **Количество worker-нод:** 2 (статус `Ready`)
+- **Зона размещения:** `ru-central1-a`
+- **Тип нод:** Прерываемые (`preemptible`) для оптимизации затрат
 
-Образ diplom-app:latest загружен в registry crpajqvnc6vh3duplq4s. Сборка выполнена командой docker build с последующим push.
+**Статус системных компонентов:**
+```bash
+# Все системные поды работают штатно
+CoreDNS         ✅ Running
+kube-proxy      ✅ Running
+metrics-server  ✅ Running
+Yandex Disk CSI ✅ Running
+```
 
-<img width="915" height="108" alt="image" src="https://github.com/user-attachments/assets/813a6866-1c7c-4924-8291-a20ac31e0c5d" />
+<a name="#-создание-тестового-приложения"></a>
+## 🐳 Создание тестового приложения
 
-# Подготовка cистемы мониторинга и деплой приложения
+![test-app1](./images/test-app/deploy1-test.png)
 
-Установлен kube-prometheus-stack через Helm. Grafana доступна по внешнему IP через LoadBalancer. На скриншоте отображён дашборд Kubernetes / Compute Resources / Cluster, демонстрирующий состояние кластера, метрики нод и потребление ресурсов.
+![test-app2](./images/test-app/deploy2-test.png)
 
-Доступ: `http://158.160.227.146`
+**Репозиторий `scorpelord/diplom-app` содержит Dockerfile на основе nginx:alpine и index.html с тестовой страницей.**
 
-Логин: `admin`
+---
 
-Пароль: `admin123`
+![test-app3](./images/test-app/deploy3-test.png)
 
-<img width="1919" height="948" alt="image" src="https://github.com/user-attachments/assets/8c4e164e-372b-470a-bb83-0072b958f878" />
+**Приложение представляет собой простой веб-сервер на базе nginx:alpine.**
 
-Приложение развёрнуто в кластере через Deployment (2 реплики) и доступно из интернета через LoadBalancer. Используется образ cr.yandex/crpajqvnc6vh3duplq4s/diplom-app:latest.
+* Репозиторий: scorpelord/diplom-app
+* Dockerfile: на основе nginx:alpine
+* Образ: diplom-app:latest
 
-Доступ: `http://158.160.210.24`
+**Сборка и публикация образа:**
+```
+# Сборка образа
+docker build -t diplom-app:latest .
 
-<img width="820" height="180" alt="image" src="https://github.com/user-attachments/assets/df7ca0df-225c-4c0f-9c42-62cdd5bee215" />
+# Тегирование для Yandex Container Registry
+docker tag diplom-app:latest \
+  cr.yandex/crpajqvnc6vh3duplq4s/diplom-app:latest
 
-# Установка и настройка CI/CD
+# Публикация в registry
+docker push cr.yandex/crpajqvnc6vh3duplq4s/diplom-app:latest
+```
+<a name="#-система-мониторинга"></a>
+## 📊 Система мониторинга
 
-Настроен CI/CD через GitHub Actions: при пуше в main происходит сборка Docker-образа и его публикация в Container Registry (зелёный запуск workflow на скриншоте).
+![Дашборд Kubernetes в Grafana](./images/monitoring/mon1.png)
+Установлен `kube-prometheus-stack` через Helm. Grafana доступна по внешнему IP через LoadBalancer. На скриншоте отображён дашборд **Kubernetes / Compute Resources / Cluster**, демонстрирующий состояние кластера, метрики нод и потребление ресурсов.
 
-<img width="1902" height="896" alt="image" src="https://github.com/user-attachments/assets/6626cf6d-2aed-4f57-9e02-708c4e224ac3" />
+**Доступ к Grafana:**
 
+| Параметр | Значение |
+|--------|----------|
+| **URL** | `http://158.160.227.146` | 
+| **Логин** | `admin` |
+| **Пароль** | `admin123` | 
 
+Настроен дашборд **Kubernetes / Compute Resources / Cluster**, который отображает:
+
+* Состояние кластера
+* Метрики worker-нод
+* Потребление ресурсов (CPU, RAM)
+
+<a name="#-деплой-приложения"></a>
+## 🚀 Деплой приложения
+
+![deploy-1](./images/deply-app/deploy1.png)
+
+**Приложение развёрнуто в кластере через Deployment (2 реплики) и доступно из интернета через LoadBalancer. Используется образ cr.yandex/crpajqvnc6vh3duplq4s/diplom-app:latest.**
+
+**Конфигурация деплоя:**
+| Параметр | Значение |
+|--------|----------|
+| **URL** | `http://158.160.210.24` | 
+
+<a name="настройка-cicd"></a>
+## 🔄 Настройка CI/CD
+
+![deploy-1](./images/ci-cd/cicd1.png)
+
+Автоматизация сборки и доставки настроена с помощью **GitHub Actions.**
+
+**Workflow:**
+
+1. Триггер: Пуш в ветку main
+2. Действия:
+    * Сборка Docker-образа
+    * Публикация образа в Yandex Container Registry
+
+> [!NOTE]
+> Последний запуск workflow завершился зелёным (успешно). Скриншот прилагается в репозитории.
