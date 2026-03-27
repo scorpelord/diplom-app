@@ -60,6 +60,8 @@ terraform apply -auto-approve
 
 **Роли были выданы через Yandex Console**
 
+---
+
 ## ПОДКЛЮЧЕНИЕ К KUBERNETES
 
 ```
