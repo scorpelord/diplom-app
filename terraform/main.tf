@@ -12,9 +12,7 @@ provider "yandex" {
   folder_id                = var.yc_folder_id
 }
 
-# ============================================
 # VPC СЕТЬ И ПОДСЕТИ
-# ============================================
 
 resource "yandex_vpc_network" "diploma" {
   name = "diploma-net"
@@ -28,9 +26,7 @@ resource "yandex_vpc_subnet" "subnets" {
   v4_cidr_blocks = [cidrsubnet("10.0.0.0/16", 8, count.index)]
 }
 
-# ============================================
 # ГРУППА БЕЗОПАСНОСТИ
-# ============================================
 
 resource "yandex_vpc_security_group" "k8s_sg" {
   name        = "k8s-sg"
@@ -58,17 +54,13 @@ resource "yandex_vpc_security_group" "k8s_sg" {
   }
 }
 
-# ============================================
-# ИСПОЛЬЗУЕМ СУЩЕСТВУЮЩИЙ СЕРВИСНЫЙ АККАУНТ (НЕ СОЗДАЁМ НОВЫЙ)
-# ============================================
+# ИСПОЛЬЗУЕМ СУЩЕСТВУЮЩИЙ СЕРВИСНЫЙ АККАУНТ
 
 data "yandex_iam_service_account" "k8s_sa" {
   name = "k8s-sa"
 }
 
-# ============================================
 # MANAGED KUBERNETES CLUSTER
-# ============================================
 
 resource "yandex_kubernetes_cluster" "diploma" {
   name        = "diploma-cluster"
@@ -90,9 +82,7 @@ resource "yandex_kubernetes_cluster" "diploma" {
   node_service_account_id = data.yandex_iam_service_account.k8s_sa.id
 }
 
-# ============================================
 # ГРУППА РАБОЧИХ НОД
-# ============================================
 
 resource "yandex_kubernetes_node_group" "worker_nodes" {
   cluster_id = yandex_kubernetes_cluster.diploma.id
@@ -128,9 +118,7 @@ resource "yandex_kubernetes_node_group" "worker_nodes" {
   }
 }
 
-# ============================================
 # OUTPUTS
-# ============================================
 
 output "cluster_id" {
   value = yandex_kubernetes_cluster.diploma.id
